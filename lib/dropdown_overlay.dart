@@ -353,10 +353,18 @@ class _SearchField extends StatefulWidget {
 
 class _SearchFieldState extends State<_SearchField> {
   final searchCtrl = TextEditingController();
+  FocusNode? _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode = FocusNode();
+  }
 
   @override
   void dispose() {
     searchCtrl.dispose();
+    _focusNode?.dispose();
     super.dispose();
   }
 
@@ -372,6 +380,7 @@ class _SearchFieldState extends State<_SearchField> {
     if (searchCtrl.text.isNotEmpty) {
       searchCtrl.clear();
       widget.onSearchedItems(widget.items);
+      _focusNode?.requestFocus();
     }
   }
 
@@ -380,7 +389,7 @@ class _SearchFieldState extends State<_SearchField> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: TextField(
-        focusNode: FocusNode(),
+        focusNode: _focusNode,
         controller: searchCtrl,
         onChanged: onSearch,
         decoration: InputDecoration(
