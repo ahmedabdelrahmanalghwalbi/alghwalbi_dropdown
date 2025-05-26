@@ -18,6 +18,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
   final int? maxSelectedItems;
   final double? customOverRelayWidth;
   final String primaryIdKey;
+  final Color selectColor;
 
   const _MultiSelectDropdownOverlay({
     required this.items,
@@ -29,6 +30,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
     required this.hideOverlay,
     required this.hintText,
     required this.primaryIdKey,
+    required this.selectColor,
     this.headerStyle,
     this.listItemStyle,
     this.excludeSelected,
@@ -132,8 +134,8 @@ class _MultiSelectDropdownOverlayState
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 24.0,
-                      color: Colors.black.withAlpha(180),
-                      offset: const Offset(0, 6),
+                      color: Colors.black.withOpacity(.08),
+                      offset: _overlayShadowOffset,
                     ),
                   ],
                 ),
@@ -276,6 +278,7 @@ class _MultiSelectDropdownOverlayState
                                     : items.length > 4
                                     ? Expanded(
                                       child: _MultiSelectItemsList(
+                                        selectColor: widget.selectColor,
                                         primaryIdKey: widget.primaryIdKey,
                                         scrollController: scrollController,
                                         items: items,
@@ -297,6 +300,7 @@ class _MultiSelectDropdownOverlayState
                                       ),
                                     )
                                     : _MultiSelectItemsList(
+                                      selectColor: widget.selectColor,
                                       primaryIdKey: widget.primaryIdKey,
                                       scrollController: scrollController,
                                       items: items,
@@ -361,6 +365,7 @@ class _MultiSelectItemsList extends StatefulWidget {
   final EdgeInsets padding;
   final TextStyle? itemTextStyle;
   final int? maxSelectedItems;
+  final Color selectColor;
 
   const _MultiSelectItemsList({
     required this.primaryIdKey,
@@ -373,6 +378,7 @@ class _MultiSelectItemsList extends StatefulWidget {
     required this.padding,
     this.itemTextStyle,
     this.maxSelectedItems,
+    required this.selectColor,
   });
 
   @override
@@ -418,15 +424,24 @@ class _MultiSelectItemsListState extends State<_MultiSelectItemsList> {
           child: Container(
             color: isSelected ? Colors.grey[100] : Colors.transparent,
             padding: const EdgeInsets.symmetric(
-              vertical: 8.0,
+              vertical: 12.0,
               horizontal: 12.0,
             ),
             child: Row(
               spacing: 8.0,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 isSelected
-                    ? Icon(Icons.check_box)
-                    : Icon(Icons.check_box_outline_blank),
+                    ? Icon(
+                      Icons.check_box_rounded,
+                      size: 18.0,
+                      color: widget.selectColor,
+                    )
+                    : Icon(
+                      Icons.check_box_outline_blank,
+                      color: listItemStyle.color,
+                      size: 18.0,
+                    ),
                 Expanded(
                   child: Text(
                     displayText,

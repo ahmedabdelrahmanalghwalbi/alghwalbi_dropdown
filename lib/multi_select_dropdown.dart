@@ -32,6 +32,7 @@ class CustomMultiDropdown extends StatefulWidget {
   final void Function()? onRemoveClicked;
   final Color? selectedItemChipBackgroundColor;
   final String primaryIdKey;
+  final Color selectColor;
 
   const CustomMultiDropdown({
     super.key,
@@ -64,6 +65,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.chipBuilder,
     this.selectedItemChipBackgroundColor,
     required this.primaryIdKey,
+    this.selectColor = Colors.black,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
@@ -99,6 +101,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.chipBuilder,
     this.selectedItemChipBackgroundColor,
     required this.primaryIdKey,
+    this.selectColor = Colors.black,
   }) : searchType = SearchType.onListData;
 
   @override
@@ -186,6 +189,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
         child: _OverlayBuilder(
           overlay: (size, hideCallback) {
             return _MultiSelectDropdownOverlay(
+              selectColor: widget.selectColor,
               primaryIdKey: widget.primaryIdKey,
               customOverRelayWidth: widget.customOverRelayWidth,
               items: widget.items ?? [],
