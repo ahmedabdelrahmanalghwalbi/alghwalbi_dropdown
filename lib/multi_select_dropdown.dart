@@ -1,25 +1,8 @@
-// Exports - only export the main library file
-export 'custom_dropdown.dart';
+part of 'custom_dropdown.dart';
 
-// Imports
-import 'dart:developer';
-import 'package:flutter/material.dart';
-
-// Parts
-part 'animated_section.dart';
-part 'dropdown_field.dart';
-part 'dropdown_overlay.dart';
-part 'overlay_builder.dart';
-part 'multi_select_dropdown.dart';
-part 'multi_select_dropdown_field.dart';
-part 'multi_select_dropdown_overlay.dart';
-
-enum SearchType { onListData }
-
-// ignore: must_be_immutable
-class CustomDropdown extends StatefulWidget {
+class CustomMultiDropdown extends StatefulWidget {
   final List<Map<String, dynamic>>? items;
-  final Map<String, dynamic>? selectedValue;
+  final List<Map<String, dynamic>>? selectedValues;
   final String? nameKey;
   final String? nameMapKey;
   final String? hintText;
@@ -33,7 +16,7 @@ class CustomDropdown extends StatefulWidget {
   final BorderRadius? borderRadius;
   final Widget? fieldSuffixIcon;
   final Widget? fieldPrefixIcon;
-  final Function(Map<String, dynamic>)? onChanged;
+  final Function(List<Map<String, dynamic>>)? onChanged;
   final bool? excludeSelected;
   final Color? fillColor;
   final EdgeInsets? contentPadding;
@@ -42,15 +25,15 @@ class CustomDropdown extends StatefulWidget {
   final Widget? label;
   final TextStyle? labelStyle;
   final String? labelText;
-  Map<String, String>? headers;
   final SearchType? searchType;
-
-  /// the widget you click at to open drop down
+  final int? maxSelectedItems;
+  final Widget Function(Map<String, dynamic>)? chipBuilder;
   final Widget? basicWidget;
-
   final void Function()? onRemoveClicked;
+  final Color? selectedItemChipBackgroundColor;
+  final String primaryIdKey;
 
-  CustomDropdown({
+  const CustomMultiDropdown({
     super.key,
     this.label,
     this.labelText,
@@ -59,7 +42,7 @@ class CustomDropdown extends StatefulWidget {
     this.nameMapKey,
     this.items,
     this.hintText,
-    this.selectedValue,
+    this.selectedValues,
     this.hintStyle,
     this.selectedStyle,
     this.errorText,
@@ -77,10 +60,14 @@ class CustomDropdown extends StatefulWidget {
     this.customOverRelayWidth,
     this.excludeSelected = true,
     this.fillColor = Colors.white,
+    this.maxSelectedItems = 5,
+    this.chipBuilder,
+    this.selectedItemChipBackgroundColor,
+    required this.primaryIdKey,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
-  CustomDropdown.search({
+  const CustomMultiDropdown.search({
     super.key,
     this.label,
     this.labelText,
@@ -89,14 +76,13 @@ class CustomDropdown extends StatefulWidget {
     this.nameKey,
     this.nameMapKey,
     this.hintText,
-    this.selectedValue,
+    this.selectedValues,
     this.hintStyle,
     this.selectedStyle,
     this.errorText,
     this.errorStyle,
     this.listItemStyle,
     this.errorBorderSide,
-    this.headers,
     this.borderRadius,
     this.borderSide,
     this.basicWidget,
@@ -109,26 +95,25 @@ class CustomDropdown extends StatefulWidget {
     this.excludeSelected = false,
     this.canCloseOutsideBounds = true,
     this.fillColor = Colors.white,
+    this.maxSelectedItems = 5,
+    this.chipBuilder,
+    this.selectedItemChipBackgroundColor,
+    required this.primaryIdKey,
   }) : searchType = SearchType.onListData;
 
   @override
-  CustomDropdownState createState() => CustomDropdownState();
+  CustomMultiDropdownState createState() => CustomMultiDropdownState();
 }
 
-class CustomDropdownState extends State<CustomDropdown> {
+class CustomMultiDropdownState extends State<CustomMultiDropdown> {
   final layerLink = LayerLink();
-  late TextEditingController textEditingController;
-  String? _initSelected;
+  late List<Map<String, dynamic>> _selectedItems;
+
   @override
   void initState() {
-    init();
     super.initState();
+    _selectedItems = widget.selectedValues ?? [];
   }
-
-  String? get widgetSelectedValue =>
-      (widget.selectedValue?[widget.nameKey] is Map)
-          ? (widget.selectedValue?[widget.nameKey][widget.nameMapKey])
-          : widget.selectedValue?[widget.nameKey];
 
   List<String> get dataItems =>
       widget.items
@@ -141,44 +126,53 @@ class CustomDropdownState extends State<CustomDropdown> {
           .toList() ??
       [];
 
-  void init() {
-    textEditingController = TextEditingController(text: widgetSelectedValue);
-    _initSelected = textEditingController.text;
+  String get selectedItemsText {
+    if (_selectedItems.isEmpty) return widget.hintText ?? 'Select items';
+    if (_selectedItems.length == 1) {
+      return _selectedItems.first[widget.nameKey] is Map
+          ? _selectedItems.first[widget.nameKey][widget.nameMapKey]
+          : _selectedItems.first[widget.nameKey];
+    }
+    return '${_selectedItems.length} items selected';
   }
 
-  void onChangeEx(String value) {
-    var result = widget.items?.indexWhere(
-      (e) =>
-          ((e[widget.nameKey] is Map)
-              ? e[widget.nameKey][widget.nameMapKey]
-              : e[widget.nameKey]) ==
-          value,
+  void _onItemSelected(Map<String, dynamic> item) {
+    final selectedIndex = _selectedItems.indexWhere(
+      (selected) =>
+          selected[widget.primaryIdKey].toString() ==
+          item[widget.primaryIdKey].toString(),
     );
-    if (result != -1) {
-      widget.onChanged?.call(widget.items?[result ?? 0] ?? {});
-    } else {
-      widget.onChanged?.call({});
-    }
+
+    setState(() {
+      if (selectedIndex != -1) {
+        _selectedItems.removeAt(selectedIndex);
+      } else {
+        if (widget.maxSelectedItems == null ||
+            _selectedItems.length < widget.maxSelectedItems!) {
+          _selectedItems.add(item);
+        }
+      }
+    });
+    widget.onChanged?.call(_selectedItems);
+  }
+
+  void _clearSelection() {
+    setState(() {
+      _selectedItems.clear();
+    });
+    widget.onChanged?.call(_selectedItems);
+    widget.onRemoveClicked?.call();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_initSelected != widgetSelectedValue) {
-      textEditingController.text = widgetSelectedValue ?? '';
-      _initSelected = widgetSelectedValue;
-    }
-
-    /// hint text
-    final hintText = widget.hintText ?? 'Select value';
-
-    // hint style :: if provided then merge with default
+    final hintText = widget.hintText ?? 'Select items';
     final hintStyle = const TextStyle(
       fontSize: 16,
       color: Color(0xFFA7A7A7),
       fontWeight: FontWeight.w400,
     ).merge(widget.hintStyle);
 
-    // selected item style :: if provided then merge with default
     final selectedStyle = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
@@ -186,36 +180,30 @@ class CustomDropdownState extends State<CustomDropdown> {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: AbsorbPointer(
-        absorbing:
-            ((widget.items == null) || (widget.items?.isEmpty ?? false))
-                ? true
-                : false,
+        absorbing: (widget.items == null || (widget.items?.isEmpty ?? false)),
         child: _OverlayBuilder(
           overlay: (size, hideCallback) {
-            return _DropdownOverlay(
+            return _MultiSelectDropdownOverlay(
+              primaryIdKey: widget.primaryIdKey,
               customOverRelayWidth: widget.customOverRelayWidth,
-              items: dataItems,
-              controller: textEditingController,
+              items: widget.items ?? [],
+              selectedItems: _selectedItems,
+              nameKey: widget.nameKey,
+              nameMapKey: widget.nameMapKey,
               size: size,
               layerLink: layerLink,
               hideOverlay: hideCallback,
               headerStyle:
-                  (textEditingController.text.isNotEmpty)
-                      ? selectedStyle
-                      : hintStyle,
+                  _selectedItems.isNotEmpty ? selectedStyle : hintStyle,
               hintText: hintText,
               listItemStyle: widget.listItemStyle,
               excludeSelected: widget.excludeSelected,
               canCloseOutsideBounds: widget.canCloseOutsideBounds,
               searchType: widget.searchType,
-              onChanged: (value) {
-                onChangeEx(value);
-                FocusScope.of(context).unfocus();
-              },
+              onItemSelected: _onItemSelected,
+              maxSelectedItems: widget.maxSelectedItems,
             );
           },
           child: (showCallback) {
@@ -230,13 +218,23 @@ class CustomDropdownState extends State<CustomDropdown> {
                         },
                         child: widget.basicWidget,
                       )
-                      : _DropDownField(
+                      : _MultiSelectDropDownField(
+                        onItemRemoved: (item) {
+                          setState(() {
+                            _selectedItems.remove(item);
+                          });
+                          widget.onChanged?.call(_selectedItems);
+                        },
+                        selectedItemChipBackgroundColor:
+                            widget.selectedItemChipBackgroundColor,
                         label: widget.label,
                         labelStyle: widget.labelStyle,
                         labelText: widget.labelText,
-                        onRemoveClicked: widget.onRemoveClicked,
+                        onRemoveClicked: _clearSelection,
                         isItemsNullOrEmpty: dataItems.isEmpty,
-                        controller: textEditingController,
+                        selectedItems: _selectedItems,
+                        nameKey: widget.nameKey,
+                        nameMapKey: widget.nameMapKey,
                         onTap: () {
                           FocusScope.of(context).unfocus();
                           showCallback();
@@ -251,9 +249,9 @@ class CustomDropdownState extends State<CustomDropdown> {
                         hintText: hintText,
                         prefixIcon: widget.fieldPrefixIcon,
                         suffixIcon: widget.fieldSuffixIcon,
-                        // onChanged: widget.onChanged,
                         fillColor: widget.fillColor,
                         contentPadding: widget.contentPadding,
+                        chipBuilder: widget.chipBuilder,
                       ),
             );
           },
