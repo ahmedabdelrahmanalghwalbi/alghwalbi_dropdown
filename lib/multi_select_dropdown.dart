@@ -33,6 +33,7 @@ class CustomMultiDropdown extends StatefulWidget {
   final Color? selectedItemChipBackgroundColor;
   final String primaryIdKey;
   final Color selectColor;
+  final String? subNameKey;
 
   const CustomMultiDropdown({
     super.key,
@@ -66,6 +67,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.selectedItemChipBackgroundColor,
     required this.primaryIdKey,
     this.selectColor = Colors.black,
+    this.subNameKey,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
@@ -102,6 +104,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.selectedItemChipBackgroundColor,
     required this.primaryIdKey,
     this.selectColor = Colors.black,
+    this.subNameKey,
   }) : searchType = SearchType.onListData;
 
   @override
@@ -208,6 +211,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
               searchType: widget.searchType,
               onItemSelected: _onItemSelected,
               maxSelectedItems: widget.maxSelectedItems,
+              subNameKey: widget.subNameKey,
             );
           },
           child: (showCallback) {

@@ -4,6 +4,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final List<Map<String, dynamic>> selectedItems;
   final String? nameKey;
+  final String? subNameKey;
   final String? nameMapKey;
   final Size size;
   final LayerLink layerLink;
@@ -24,6 +25,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
     required this.items,
     required this.selectedItems,
     required this.nameKey,
+    this.subNameKey,
     this.nameMapKey,
     required this.size,
     required this.layerLink,
@@ -287,6 +289,7 @@ class _MultiSelectDropdownOverlayState
                                         nameMapKey: widget.nameMapKey,
                                         padding: listPadding,
                                         itemTextStyle: widget.listItemStyle,
+                                        subNameKey: widget.subNameKey,
                                         onItemSelect: (item) {
                                           widget.onItemSelected(item);
                                           if (searchCtrl.text.isNotEmpty) {
@@ -309,6 +312,7 @@ class _MultiSelectDropdownOverlayState
                                       nameMapKey: widget.nameMapKey,
                                       padding: listPadding,
                                       itemTextStyle: widget.listItemStyle,
+                                      subNameKey: widget.subNameKey,
                                       onItemSelect: (item) {
                                         widget.onItemSelected(item);
                                         if (searchCtrl.text.isNotEmpty) {
@@ -359,6 +363,7 @@ class _MultiSelectItemsList extends StatefulWidget {
   final List<Map<String, dynamic>> items;
   final List<Map<String, dynamic>> selectedItems;
   final String? nameKey;
+  final String? subNameKey;
   final String? nameMapKey;
   final String primaryIdKey;
   final ValueSetter<Map<String, dynamic>> onItemSelect;
@@ -373,6 +378,7 @@ class _MultiSelectItemsList extends StatefulWidget {
     required this.items,
     required this.selectedItems,
     required this.nameKey,
+    this.subNameKey,
     this.nameMapKey,
     required this.onItemSelect,
     required this.padding,
@@ -386,11 +392,17 @@ class _MultiSelectItemsList extends StatefulWidget {
 }
 
 class _MultiSelectItemsListState extends State<_MultiSelectItemsList> {
+  Set<String> get selectedItemIds =>
+      widget.selectedItems
+          .map((item) => item[widget.primaryIdKey].toString())
+          .toSet();
+
   @override
   Widget build(BuildContext context) {
     final listItemStyle = const TextStyle(
-      fontSize: 16,
-    ).merge(widget.itemTextStyle);
+      fontSize: 14.0,
+      color: Colors.black87,
+    );
     return ListView.builder(
       controller: widget.scrollController,
       shrinkWrap: true,
@@ -398,15 +410,14 @@ class _MultiSelectItemsListState extends State<_MultiSelectItemsList> {
       itemCount: widget.items.length,
       itemBuilder: (_, index) {
         final item = widget.items[index];
+        final itemId = item[widget.primaryIdKey].toString();
         final displayText =
             item[widget.nameKey] is Map
                 ? item[widget.nameKey][widget.nameMapKey].toString()
                 : item[widget.nameKey].toString();
-        final isSelected = widget.selectedItems.any(
-          (selected) =>
-              selected[widget.primaryIdKey].toString() ==
-              item[widget.primaryIdKey].toString(),
-        );
+        final subDisplayText =
+            widget.subNameKey != null ? item[widget.subNameKey] : null;
+        final isSelected = selectedItemIds.contains(itemId);
         final isDisabled =
             widget.maxSelectedItems != null &&
             widget.selectedItems.length >= widget.maxSelectedItems! &&
@@ -422,7 +433,7 @@ class _MultiSelectItemsListState extends State<_MultiSelectItemsList> {
                     widget.onItemSelect(item);
                   },
           child: Container(
-            color: isSelected ? Colors.grey[100] : Colors.transparent,
+            color: Colors.transparent,
             padding: const EdgeInsets.symmetric(
               vertical: 12.0,
               horizontal: 12.0,
@@ -434,22 +445,40 @@ class _MultiSelectItemsListState extends State<_MultiSelectItemsList> {
                 isSelected
                     ? Icon(
                       Icons.check_box_rounded,
-                      size: 18.0,
+                      size: 16.0,
                       color: widget.selectColor,
                     )
                     : Icon(
                       Icons.check_box_outline_blank,
-                      color: listItemStyle.color,
-                      size: 18.0,
+                      color:
+                          isDisabled ? Colors.grey[400] : listItemStyle.color,
+                      size: 16.0,
                     ),
                 Expanded(
-                  child: Text(
-                    displayText,
-                    style: listItemStyle.copyWith(
-                      color: isDisabled ? Colors.grey : listItemStyle.color,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayText,
+                        style: listItemStyle.copyWith(
+                          color:
+                              isDisabled
+                                  ? Colors.grey[400]
+                                  : listItemStyle.color,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      if (subDisplayText != null)
+                        Text(
+                          subDisplayText,
+                          style: TextStyle(color: Colors.grey, fontSize: 12.0),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
                 ),
               ],
