@@ -34,6 +34,9 @@ class CustomMultiDropdown extends StatefulWidget {
   final String primaryIdKey;
   final Color selectColor;
   final String? subNameKey;
+  final Function(List<Map<String, dynamic>>)? onComplete;
+  final VoidCallback? onMaxItemsSelected;
+  final CustomMultiDropdownController? controller;
 
   const CustomMultiDropdown({
     super.key,
@@ -68,6 +71,9 @@ class CustomMultiDropdown extends StatefulWidget {
     required this.primaryIdKey,
     this.selectColor = Colors.black,
     this.subNameKey,
+    this.onMaxItemsSelected,
+    this.controller,
+    this.onComplete,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
@@ -105,6 +111,9 @@ class CustomMultiDropdown extends StatefulWidget {
     required this.primaryIdKey,
     this.selectColor = Colors.black,
     this.subNameKey,
+    this.onComplete,
+    this.onMaxItemsSelected,
+    this.controller,
   }) : searchType = SearchType.onListData;
 
   @override
@@ -114,11 +123,55 @@ class CustomMultiDropdown extends StatefulWidget {
 class CustomMultiDropdownState extends State<CustomMultiDropdown> {
   final layerLink = LayerLink();
   late List<Map<String, dynamic>> _selectedItems;
+  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
     super.initState();
     _selectedItems = widget.selectedValues ?? [];
+    widget.controller?.attach(this);
+  }
+
+  void _showOverlay() {
+    if (_overlayEntry == null) {
+      _overlayEntry = OverlayEntry(
+        builder: (context) {
+          return _MultiSelectDropdownOverlay(
+            selectColor: widget.selectColor,
+            primaryIdKey: widget.primaryIdKey,
+            customOverRelayWidth: widget.customOverRelayWidth,
+            items: widget.items ?? [],
+            selectedItems: _selectedItems,
+            nameKey: widget.nameKey,
+            nameMapKey: widget.nameMapKey,
+            size: Size.zero,
+            layerLink: layerLink,
+            hideOverlay: _hideOverlay,
+            headerStyle:
+                _selectedItems.isNotEmpty
+                    ? widget.selectedStyle
+                    : widget.hintStyle,
+            hintText: widget.hintText ?? 'Select items',
+            listItemStyle: widget.listItemStyle,
+            excludeSelected: widget.excludeSelected,
+            canCloseOutsideBounds: widget.canCloseOutsideBounds,
+            searchType: widget.searchType,
+            onItemSelected: _onItemSelected,
+            maxSelectedItems: widget.maxSelectedItems,
+            subNameKey: widget.subNameKey,
+            onComplete: () {
+              widget.onComplete?.call(_selectedItems); // Pass selected items
+            },
+          );
+        },
+      );
+      Overlay.of(context).insert(_overlayEntry!);
+    }
+  }
+
+  void _hideOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
   }
 
   List<String> get dataItems =>
@@ -156,6 +209,8 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
         if (widget.maxSelectedItems == null ||
             _selectedItems.length < widget.maxSelectedItems!) {
           _selectedItems.add(item);
+        } else {
+          widget.onMaxItemsSelected?.call();
         }
       }
     });

@@ -13,6 +13,7 @@ part 'overlay_builder.dart';
 part 'multi_select_dropdown.dart';
 part 'multi_select_dropdown_field.dart';
 part 'multi_select_dropdown_overlay.dart';
+part 'multi_select_controller.dart';
 
 enum SearchType { onListData }
 
@@ -119,10 +120,11 @@ class CustomDropdownState extends State<CustomDropdown> {
   final layerLink = LayerLink();
   late TextEditingController textEditingController;
   String? _initSelected;
+
   @override
   void initState() {
-    init();
     super.initState();
+    init();
   }
 
   String? get widgetSelectedValue =>

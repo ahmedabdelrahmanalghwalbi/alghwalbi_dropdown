@@ -20,6 +20,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
   final double? customOverRelayWidth;
   final String primaryIdKey;
   final Color selectColor;
+  final VoidCallback? onComplete;
 
   const _MultiSelectDropdownOverlay({
     required this.items,
@@ -41,6 +42,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
     required this.onItemSelected,
     this.maxSelectedItems,
     this.customOverRelayWidth,
+    this.onComplete,
   });
 
   @override
@@ -352,6 +354,29 @@ class _MultiSelectDropdownOverlayState
                 height: MediaQuery.of(context).size.height,
                 color: Colors.transparent,
                 child: child,
+                // child: Column(
+                //   mainAxisSize: MainAxisSize.min,
+                //   children: [
+                //     Expanded(child: child),
+                //     if (widget.onComplete != null)
+                //       Padding(
+                //         padding: const EdgeInsets.all(8.0),
+                //         child: Row(
+                //           mainAxisAlignment: MainAxisAlignment.end,
+                //           children: [
+                //             if (widget.onComplete != null)
+                //               ElevatedButton(
+                //                 onPressed: () {
+                //                   widget.hideOverlay();
+                //                   widget.onComplete?.call();
+                //                 },
+                //                 child: const Text('Confirm'),
+                //               ),
+                //           ],
+                //         ),
+                //       ),
+                //   ],
+                // ),
               )
               : child,
     );
