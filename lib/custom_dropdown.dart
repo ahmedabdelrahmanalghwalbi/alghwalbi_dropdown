@@ -50,6 +50,7 @@ class CustomDropdown extends StatefulWidget {
   final Widget? basicWidget;
 
   final void Function()? onRemoveClicked;
+  final String? searchHintText;
 
   CustomDropdown({
     super.key,
@@ -78,6 +79,7 @@ class CustomDropdown extends StatefulWidget {
     this.customOverRelayWidth,
     this.excludeSelected = true,
     this.fillColor = Colors.white,
+    this.searchHintText,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
@@ -110,6 +112,7 @@ class CustomDropdown extends StatefulWidget {
     this.excludeSelected = false,
     this.canCloseOutsideBounds = true,
     this.fillColor = Colors.white,
+    this.searchHintText,
   }) : searchType = SearchType.onListData;
 
   @override
@@ -199,6 +202,7 @@ class CustomDropdownState extends State<CustomDropdown> {
         child: _OverlayBuilder(
           overlay: (size, hideCallback) {
             return _DropdownOverlay(
+              searchHintText: widget.searchHintText,
               customOverRelayWidth: widget.customOverRelayWidth,
               items: dataItems,
               controller: textEditingController,

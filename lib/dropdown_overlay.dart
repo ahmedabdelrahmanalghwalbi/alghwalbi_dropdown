@@ -24,6 +24,7 @@ class _DropdownOverlay extends StatefulWidget {
   final SearchType? searchType;
   final Function(String)? onChanged;
   final double? customOverRelayWidth;
+  final String? searchHintText;
 
   const _DropdownOverlay({
     required this.items,
@@ -39,6 +40,7 @@ class _DropdownOverlay extends StatefulWidget {
     this.searchType,
     this.customOverRelayWidth,
     this.onChanged,
+    this.searchHintText,
   });
 
   @override
@@ -251,6 +253,7 @@ class _DropdownOverlayState extends State<_DropdownOverlay> {
                                 if (onListDataSearch)
                                   _SearchField(
                                     items: filteredItems,
+                                    searchHintText: widget.searchHintText,
                                     onSearchedItems: (val) {
                                       setState(() => items = val);
                                     },
@@ -343,9 +346,14 @@ class _ItemsList extends StatelessWidget {
 }
 
 class _SearchField extends StatefulWidget {
+  final String? searchHintText;
   final List<String> items;
   final void Function(List<String>) onSearchedItems;
-  const _SearchField({required this.items, required this.onSearchedItems});
+  const _SearchField({
+    required this.items,
+    required this.onSearchedItems,
+    this.searchHintText,
+  });
 
   @override
   State<_SearchField> createState() => _SearchFieldState();
@@ -397,7 +405,7 @@ class _SearchFieldState extends State<_SearchField> {
           fillColor: Colors.grey[50],
           constraints: const BoxConstraints.tightFor(height: 40),
           contentPadding: const EdgeInsets.all(8),
-          hintText: 'Search',
+          hintText: widget.searchHintText ?? 'Search',
           hintStyle: const TextStyle(color: Colors.grey),
           prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 22),
           suffixIcon: GestureDetector(

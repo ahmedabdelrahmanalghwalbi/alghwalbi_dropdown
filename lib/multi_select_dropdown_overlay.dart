@@ -21,6 +21,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
   final String primaryIdKey;
   final Color selectColor;
   final VoidCallback? onComplete;
+  final String? searchHintText;
 
   const _MultiSelectDropdownOverlay({
     required this.items,
@@ -43,6 +44,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
     this.maxSelectedItems,
     this.customOverRelayWidth,
     this.onComplete,
+    this.searchHintText,
   });
 
   @override
@@ -216,7 +218,7 @@ class _MultiSelectDropdownOverlayState
                                               height: 40,
                                             ),
                                         contentPadding: const EdgeInsets.all(8),
-                                        hintText: 'Search',
+                                        hintText: widget.searchHintText,
                                         hintStyle: const TextStyle(
                                           color: Colors.grey,
                                         ),

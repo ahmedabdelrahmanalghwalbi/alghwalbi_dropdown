@@ -37,6 +37,7 @@ class CustomMultiDropdown extends StatefulWidget {
   final Function(List<Map<String, dynamic>>)? onComplete;
   final VoidCallback? onMaxItemsSelected;
   final CustomMultiDropdownController? controller;
+  final String? searchHintText;
 
   const CustomMultiDropdown({
     super.key,
@@ -74,6 +75,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.onMaxItemsSelected,
     this.controller,
     this.onComplete,
+    this.searchHintText,
   }) : searchType = null,
        canCloseOutsideBounds = true;
 
@@ -114,6 +116,7 @@ class CustomMultiDropdown extends StatefulWidget {
     this.onComplete,
     this.onMaxItemsSelected,
     this.controller,
+    this.searchHintText,
   }) : searchType = SearchType.onListData;
 
   @override
@@ -137,6 +140,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
       _overlayEntry = OverlayEntry(
         builder: (context) {
           return _MultiSelectDropdownOverlay(
+            searchHintText: widget.searchHintText,
             selectColor: widget.selectColor,
             primaryIdKey: widget.primaryIdKey,
             customOverRelayWidth: widget.customOverRelayWidth,
@@ -247,6 +251,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
         child: _OverlayBuilder(
           overlay: (size, hideCallback) {
             return _MultiSelectDropdownOverlay(
+              searchHintText: widget.searchHintText,
               selectColor: widget.selectColor,
               primaryIdKey: widget.primaryIdKey,
               customOverRelayWidth: widget.customOverRelayWidth,
