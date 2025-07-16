@@ -25,6 +25,7 @@ class _DropdownOverlay extends StatefulWidget {
   final Function(String)? onChanged;
   final double? customOverRelayWidth;
   final String? searchHintText;
+  final BorderRadius? borderRadius;
 
   const _DropdownOverlay({
     required this.items,
@@ -41,6 +42,7 @@ class _DropdownOverlay extends StatefulWidget {
     this.customOverRelayWidth,
     this.onChanged,
     this.searchHintText,
+    this.borderRadius,
   });
 
   @override
@@ -119,9 +121,6 @@ class _DropdownOverlayState extends State<_DropdownOverlay> {
     // search availability check
     final onListDataSearch = widget.searchType == SearchType.onListData;
 
-    // border radius
-    final borderRadius = BorderRadius.circular(12);
-
     // overlay icon
     final overlayIcon = Icon(
       displayOverlayBottom
@@ -181,7 +180,8 @@ class _DropdownOverlayState extends State<_DropdownOverlay> {
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: borderRadius,
+                  borderRadius:
+                      widget.borderRadius ?? BorderRadius.circular(12.0),
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 24.0,
@@ -208,7 +208,8 @@ class _DropdownOverlayState extends State<_DropdownOverlay> {
                               ? MediaQuery.of(context).size.height / 2
                               : null,
                       child: ClipRRect(
-                        borderRadius: borderRadius,
+                        borderRadius:
+                            widget.borderRadius ?? BorderRadius.circular(12.0),
                         child: NotificationListener<
                           OverscrollIndicatorNotification
                         >(

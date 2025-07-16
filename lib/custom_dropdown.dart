@@ -218,6 +218,7 @@ class CustomDropdownState extends State<CustomDropdown> {
               excludeSelected: widget.excludeSelected,
               canCloseOutsideBounds: widget.canCloseOutsideBounds,
               searchType: widget.searchType,
+              borderRadius: widget.borderRadius,
               onChanged: (value) {
                 onChangeEx(value);
                 FocusScope.of(context).unfocus();

@@ -22,6 +22,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
   final Color selectColor;
   final VoidCallback? onComplete;
   final String? searchHintText;
+  final BorderRadius? borderRadius;
 
   const _MultiSelectDropdownOverlay({
     required this.items,
@@ -45,6 +46,7 @@ class _MultiSelectDropdownOverlay extends StatefulWidget {
     this.customOverRelayWidth,
     this.onComplete,
     this.searchHintText,
+    this.borderRadius,
   });
 
   @override
@@ -109,7 +111,6 @@ class _MultiSelectDropdownOverlayState
   @override
   Widget build(BuildContext context) {
     final onListDataSearch = widget.searchType == SearchType.onListData;
-    final borderRadius = BorderRadius.circular(12);
     final overlayIcon = Icon(
       displayOverlayBottom
           ? Icons.keyboard_arrow_up_rounded
@@ -136,7 +137,8 @@ class _MultiSelectDropdownOverlayState
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: borderRadius,
+                  borderRadius:
+                      widget.borderRadius ?? BorderRadius.circular(12.0),
                   boxShadow: [
                     BoxShadow(
                       blurRadius: 24.0,
@@ -157,7 +159,8 @@ class _MultiSelectDropdownOverlayState
                               ? MediaQuery.of(context).size.height / 2
                               : null,
                       child: ClipRRect(
-                        borderRadius: borderRadius,
+                        borderRadius:
+                            widget.borderRadius ?? BorderRadius.circular(12.0),
                         child: NotificationListener<
                           OverscrollIndicatorNotification
                         >(

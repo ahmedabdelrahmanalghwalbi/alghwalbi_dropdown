@@ -163,6 +163,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
             onItemSelected: _onItemSelected,
             maxSelectedItems: widget.maxSelectedItems,
             subNameKey: widget.subNameKey,
+            borderRadius: widget.borderRadius,
             onComplete: () {
               widget.onComplete?.call(_selectedItems); // Pass selected items
             },
@@ -266,6 +267,7 @@ class CustomMultiDropdownState extends State<CustomMultiDropdown> {
                   _selectedItems.isNotEmpty ? selectedStyle : hintStyle,
               hintText: hintText,
               listItemStyle: widget.listItemStyle,
+              borderRadius: widget.borderRadius,
               excludeSelected: widget.excludeSelected,
               canCloseOutsideBounds: widget.canCloseOutsideBounds,
               searchType: widget.searchType,
